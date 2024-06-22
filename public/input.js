@@ -46,9 +46,5 @@ inquirer.prompt(questions)
 })
 }
 
-function init() {
-    userInput();
-}
-init();
 
-//module.exports = init();
+module.exports = userInput;

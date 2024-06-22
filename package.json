@@ -1,5 +1,19 @@
 {
+  "name": "eric-employee-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "inquirer": "^8.2.4"
+    "express": "^4.19.2",
+    "inquirer": "^8.2.4",
+    "jshint": "^2.13.6",
+    "pg": "^8.12.0"
   }
 }
