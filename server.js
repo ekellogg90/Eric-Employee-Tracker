@@ -6,9 +6,6 @@ const { Pool } = require('pg');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-
-
-
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -43,95 +40,89 @@ function userInput() {
 
 inquirer.prompt(questions)
 .then((data) => {
-    let selection = '';
     switch (data.options) {
         case 'View All Departments':
             viewDepartments();
-            //console.log(selection);
             break;
         case 'View All Roles':
-            selection = 'TODO show job title, role id, dept role belongs to, and salary';
+            viewRoles();
             break;
         case 'View All Employees':
-            selection = 'TODO formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to';
+            viewEmployees();
             break;
         case 'Add a Department':
-            selection = 'prompted to enter the name of the department and that department is added to the database';
+            addDepartment();
             break;
         case 'Add a Role':
-            selection = 'prompted to enter the name, salary, and department for the role and that role is added to the database';
+            addRole();
             break;
         case 'Add an Employee':
-            selection = 'prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database';
+            addEmployee();
             break;
         case 'Update an Employee Role':
-            selection = 'prompted to select an employee to update and their new role and this information is updated in the database';
+            updateEmployeeRole();
             break;
     }
 })
 };
 
-const viewDepartments = () => {
+function viewDepartments() {
     let query = `
 SELECT department.name AS "Department", department.id AS "Dept ID"
 FROM department;`;
-pool.query(query, function (err, { rows }) {
-    console.log(rows);
-    if (err) res.status(500).json({ error: err.message });
-    res.json({
-        message: "success",
-        data: rows,
+    pool.query(query, function (err, { rows }) {
+        console.log(rows);
+        if (err) {
+            console.log('error', err.message);
+        }
+        userInput();
     });
-});
 };
 
-app.get(`/api/view-departments`, ({ body }, res) => {
-    pool.query(`
-SELECT department.name AS "Department", department.id AS "Dept ID"
-FROM department;`, 
-function (err, { rows }) {
-    console.log(rows);
-    if (err) res.status(500).json({ error: err.message });
-
-    res.json({
-        message: "success",
-        data: rows,
-    });
-});
-});
-
-app.get(`/api/view-roles`, ({ body }, res) => {
-    pool.query(`
+function viewRoles() {
+    let query = `
 SELECT roles.id AS "role ID", roles.title, roles.salary, department.name AS "department"
 FROM department
-INNER JOIN roles on roles.department_id = department.id;`, 
-function (err, { rows }) {
+INNER JOIN roles on roles.department_id = department.id;`;
+    pool.query(query, function (err, { rows }) {
         console.log(rows);
-        if (err) res.status(500).json({ error: err.message });
-
-        res.json({
-            message: "success",
-            data: rows,
-        });
+        if (err) { 
+            console.log('error', err.message);
+        }
+        userInput();
     });
-});
+};
 
-app.get(`/api/view-employees`, ({ body }, res) => {
-    pool.query(`
+function viewEmployees() {
+    let query = `
 SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name AS department, roles.salary, employee.manager_id 
 FROM department 
 INNER JOIN roles ON roles.department_id = department.id 
-INNER JOIN employee ON employee.role_id = roles.id;`,
-function (err, { rows }) {
-    console.log(rows);
-    if (err) res.status(500).json({ error: err.message });
-
-    res.json({
-        message: "success",
-        data: rows,
+INNER JOIN employee ON employee.role_id = roles.id;`
+    pool.query(query, function (err, { rows }) {
+        console.log(rows);
+        if (err) {
+            console.log('error', err.message);
+        }
+        userInput();
     });
-});
-});
+};
+
+function addDepartment() {
+
+};
+
+function addRole() {
+
+};
+
+function addEmployee() {
+
+};
+
+function updateEmployeeRole() {
+
+};
 
 // app.post(`/api/add-department`)
 // app.post(`/api/add-role`)
