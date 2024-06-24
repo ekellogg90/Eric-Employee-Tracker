@@ -117,7 +117,9 @@ function addDepartment() {
         },
     ])
     .then((response) => {
-        let query = `INSERT INTO department (name) VALUES ($1)`;
+        let query = `
+INSERT INTO department (name) 
+VALUES ($1);`;
         console.log(response);
         pool.query(query, [response.deptName], (err, res) => {
             //console.log(res);
@@ -148,7 +150,9 @@ function addRole() {
         },
     ])
     .then((response) => {
-        let query = `INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3)`; // TODO figure out how to have them insert department name instead of ID?
+        let query = `
+INSERT INTO roles (title, salary, department_id) 
+VALUES ($1, $2, $3);`; // TODO figure out how to have them insert department name instead of ID?
         console.log(response);
         pool.query(query, [response.roleTitle, response.roleSalary, response.roleDepartment], (err, res) => {
             console.log(res);
@@ -184,7 +188,9 @@ function addEmployee() {
         },
     ])
     .then((response) => {
-        let query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
+        let query = `
+INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+VALUES ($1, $2, $3, $4);`;
         console.log(response);
         pool.query(query, [response.firstName, response.lastName, response.empRole, response.manager], (err, res) => {
             console.log(res);
@@ -197,13 +203,61 @@ function addEmployee() {
 };
 
 function updateEmployeeRole() {
-    let empList = `SELECT * from employee`;
-    inquirer.prompt([
-        {
-            type: 'list',
-            name: 'empSelect',
-            message: 'Choose employee to update:',
-            choices: [empList],
-        },
-    ])
+    let empList = `
+SELECT employee.id AS "Emp ID", employee.first_name, employee.last_name, roles.id AS "Role ID", roles.title 
+FROM employee, roles, department 
+WHERE department.id = roles.department_id AND roles.id = employee.role_id;`;
+    pool.query(empList, (err, res) => {
+        console.log(res.rows);
+        if (err) {
+            console.log(`error on update employee call`, err.message);
+        }
+        let employees = [];
+        let roles = [];
+        res.rows.forEach((employee) => {employees.push(`${employee.first_name} ${employee.last_name}`);});
+        console.log(employees);
+        res.rows.forEach((roleName) => {roles.push(`${roleName.title}`);});
+        console.log(roles);
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'empSelect',
+                message: 'Choose employee to update:',
+                choices: employees,
+            },
+            {
+                type: 'list',
+                name: 'roleSelect',
+                message: 'Choose new Role:',
+                choices: roles,
+            }
+        ])
+        .then((response) => {
+            console.log(response);
+            let updatedTitleId = '';
+            let empId = '';
+            res.rows.forEach((role) => {
+                if (response.roleSelect == role.title) {
+                    updatedTitleId = role.id;
+                }
+            });
+            res.rows.forEach((employee) => {
+                if (response.empSelect == `${employee.first_name} ${employee.last_name}`) {
+                    empId = employee.id;
+                }
+            });
+            let query = `
+UPDATE employee 
+SET (employee.role_id) = ($1) 
+WHERE employee.id = ($2);`;
+            pool.query(query, [updatedTitleId, empId]), (err, res) => {
+                console.log(res);
+                if (err) {
+                    console.log(`error on employee update`, err.message);
+                }
+                userInput();
+            }
+        })
+    })
+
 };
