@@ -109,23 +109,101 @@ INNER JOIN employee ON employee.role_id = roles.id;`
 };
 
 function addDepartment() {
-
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'deptName',
+            message: 'Enter new Department name:',
+        },
+    ])
+    .then((response) => {
+        let query = `INSERT INTO department (name) VALUES ($1)`;
+        console.log(response);
+        pool.query(query, [response.deptName], (err, res) => {
+            //console.log(res);
+            if (err) {
+                console.log('error on dept add', err.message);
+            }
+            userInput();
+        });
+    });
 };
 
 function addRole() {
-
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'roleTitle',
+            message: 'Enter new Role:',
+        },
+        {
+            type: 'input',
+            name: 'roleSalary',
+            message: 'Enter Salary:',
+        },
+        {
+            type: 'input',
+            name: 'roleDepartment',
+            message: 'Enter Department ID:', // TODO change this to just department later?
+        },
+    ])
+    .then((response) => {
+        let query = `INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3)`; // TODO figure out how to have them insert department name instead of ID?
+        console.log(response);
+        pool.query(query, [response.roleTitle, response.roleSalary, response.roleDepartment], (err, res) => {
+            console.log(res);
+            if (err) {
+                console.log('error on role add', err.message);
+            }
+            userInput();
+        });
+    });
 };
 
 function addEmployee() {
-
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: 'Enter First Name:',
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: 'Enter Last Name:',
+        },
+        {
+            type: 'input',
+            name: 'empRole',
+            message: 'Enter Role ID:',  // TODO change this to role
+        },
+        {
+            type: 'input',
+            name: 'manager',
+            message: 'Enter Manager ID:', // TODO change this to manager
+        },
+    ])
+    .then((response) => {
+        let query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
+        console.log(response);
+        pool.query(query, [response.firstName, response.lastName, response.empRole, response.manager], (err, res) => {
+            console.log(res);
+            if (err) {
+                console.log(`error on employee add`, err.message);
+            }
+            userInput();
+        });
+    })
 };
 
 function updateEmployeeRole() {
-
+    let empList = `SELECT * from employee`;
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'empSelect',
+            message: 'Choose employee to update:',
+            choices: [empList],
+        },
+    ])
 };
-
-// app.post(`/api/add-department`)
-// app.post(`/api/add-role`)
-// app.post(`/api/add-employee`)
-
-// app.put(`/api/update-employee/:id`)
