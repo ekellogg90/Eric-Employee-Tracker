@@ -1,4 +1,3 @@
-const input = require('./public/input');
 const inquirer = require('inquirer');
 const express = require('express');
 const { Pool } = require('pg');
@@ -71,7 +70,7 @@ function viewDepartments() {
 SELECT department.name AS "Department", department.id AS "Dept ID"
 FROM department;`;
     pool.query(query, function (err, { rows }) {
-        console.log(rows);
+        console.table(rows);
         if (err) {
             console.log('error', err.message);
         }
@@ -85,7 +84,7 @@ SELECT roles.id AS "role ID", roles.title, roles.salary, department.name AS "dep
 FROM department
 INNER JOIN roles on roles.department_id = department.id;`;
     pool.query(query, function (err, { rows }) {
-        console.log(rows);
+        console.table(rows);
         if (err) { 
             console.log('error', err.message);
         }
@@ -100,7 +99,7 @@ FROM department
 INNER JOIN roles ON roles.department_id = department.id 
 INNER JOIN employee ON employee.role_id = roles.id;`
     pool.query(query, function (err, { rows }) {
-        console.log(rows);
+        console.table(rows);
         if (err) {
             console.log('error', err.message);
         }
@@ -179,12 +178,12 @@ function addEmployee() {
         {
             type: 'input',
             name: 'empRole',
-            message: 'Enter Role ID:',  // TODO change this to role
+            message: 'Enter Role ID:',
         },
         {
             type: 'input',
             name: 'manager',
-            message: 'Enter Manager ID:', // TODO change this to manager
+            message: 'Enter Manager ID:',
         },
     ])
     .then((response) => {
@@ -213,11 +212,18 @@ WHERE department.id = roles.department_id AND roles.id = employee.role_id;`;
             console.log(`error on update employee call`, err.message);
         }
         let employees = [];
-        let roles = [];
-        res.rows.forEach((employee) => {employees.push(`${employee.first_name} ${employee.last_name}`);});
+        res.rows.forEach((employee) => {employees.push(`${employee.first_name} ${employee.last_name}`)});
         console.log(employees);
-        res.rows.forEach((roleName) => {roles.push(`${roleName.title}`);});
-        console.log(roles);
+
+        let roleList = `SELECT roles.id, roles.title FROM roles`;
+        pool.query(roleList, (err, res) => {
+            console.log(res.rows);
+            if (err) {
+                console.log(`error`, err.message);
+            }
+            let rolesArr = [];
+            res.rows.forEach((role) => {rolesArr.push(role.title);});
+
         inquirer.prompt([
             {
                 type: 'list',
@@ -229,7 +235,7 @@ WHERE department.id = roles.department_id AND roles.id = employee.role_id;`;
                 type: 'list',
                 name: 'roleSelect',
                 message: 'Choose new Role:',
-                choices: roles,
+                choices: rolesArr,
             }
         ])
         .then((response) => {
@@ -237,19 +243,23 @@ WHERE department.id = roles.department_id AND roles.id = employee.role_id;`;
             let updatedTitleId = '';
             let empId = '';
             res.rows.forEach((role) => {
-                if (response.roleSelect == role.title) {
+                console.log(role.title);
+                console.log(role.id);
+                if (response.roleSelect === role.title) {
                     updatedTitleId = role.id;
+                    console.log(updatedTitleId);
                 }
             });
             res.rows.forEach((employee) => {
                 if (response.empSelect == `${employee.first_name} ${employee.last_name}`) {
                     empId = employee.id;
+                    console.log(empId);
                 }
             });
             let query = `
 UPDATE employee 
-SET (employee.role_id) = ($1) 
-WHERE employee.id = ($2);`;
+SET role_id = ($1) 
+WHERE id = ($2);`;
             pool.query(query, [updatedTitleId, empId]), (err, res) => {
                 console.log(res);
                 if (err) {
@@ -258,6 +268,7 @@ WHERE employee.id = ($2);`;
                 userInput();
             }
         })
+    })
     })
 
 };
