@@ -22,6 +22,8 @@ npm init -y, npm i, npm i express inquirer@8.2.4 pg
 ## Usage
 Use node index.js to start this application.
 
+[Video Demo](https://drive.google.com/file/d/18e7Q9Q5H7MMM3121NKtoy3_oH7t4tuFU/view?usp=sharing)
+
 ## License
 This application is covered under the MIT license.
 
