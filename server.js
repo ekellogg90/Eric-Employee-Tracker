@@ -119,9 +119,8 @@ function addDepartment() {
         let query = `
 INSERT INTO department (name) 
 VALUES ($1);`;
-        console.log(response);
+        console.table(response);
         pool.query(query, [response.deptName], (err, res) => {
-            //console.log(res);
             if (err) {
                 console.log('error on dept add', err.message);
             }
@@ -152,9 +151,8 @@ function addRole() {
         let query = `
 INSERT INTO roles (title, salary, department_id) 
 VALUES ($1, $2, $3);`;
-        console.log(response);
+        console.table(response);
         pool.query(query, [response.roleTitle, response.roleSalary, response.roleDepartment], (err, res) => {
-            console.log(res);
             if (err) {
                 console.log('error on role add', err.message);
             }
@@ -190,9 +188,8 @@ function addEmployee() {
         let query = `
 INSERT INTO employee (first_name, last_name, role_id, manager_id) 
 VALUES ($1, $2, $3, $4);`;
-        console.log(response);
+        console.table(response);
         pool.query(query, [response.firstName, response.lastName, response.empRole, response.manager], (err, res) => {
-            console.log(res);
             if (err) {
                 console.log(`error on employee add`, err.message);
             }
