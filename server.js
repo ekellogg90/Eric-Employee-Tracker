@@ -145,13 +145,13 @@ function addRole() {
         {
             type: 'input',
             name: 'roleDepartment',
-            message: 'Enter Department ID:', // TODO change this to just department later?
+            message: 'Enter Department ID:',
         },
     ])
     .then((response) => {
         let query = `
 INSERT INTO roles (title, salary, department_id) 
-VALUES ($1, $2, $3);`; // TODO figure out how to have them insert department name instead of ID?
+VALUES ($1, $2, $3);`;
         console.log(response);
         pool.query(query, [response.roleTitle, response.roleSalary, response.roleDepartment], (err, res) => {
             console.log(res);
